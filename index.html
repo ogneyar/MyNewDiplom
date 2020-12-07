@@ -1,22 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой НОВЫЙ диплом</title>
-    <style>
-        body {
-            background: #eee;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой НОВЫЙ диплом</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      text-decoration: none;
+    }
+    body {
+      background: #eee;
+      text-align: center;
+    }
+    h1 {
+      padding: 70px 0px;
+    }
+    h1 b {
+      color: red;
+    }
+    .menu {
+      padding: 50px 0;
+    }
+    a {
+      border: 1px solid blue;
+      padding: 5px;
+      background: rgb(54, 48, 143);
+      color: white;
+      border-radius: 5px;
+    }
+    a:hover {
+      background: white;
+      color: rgb(54, 48, 143);
+    }
+  </style>
 </head>
 <body>
-    <h1><center>Мой личный сервер!!! <font color=red><b>(13th)</b></font></center></h1>
+  <div class="main">
+    <h1>Мой личный сервер!!! <b>(13th)</b></h1>
     <hr>
-    
-    <LI><a href=shop\shop.phtml>Мой магазин!</a><br>
-    <br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div class="menu">
+      <a href=/shop/shop.php>Мой магазин!</a>
+    </div>    
     <hr>
-    <LI><center><a href=shop\admin.phtml>Только для Администратора!</a><br><br></center>
+    <div class="menu">
+      <a href="/admin/admin.php">Только для Администратора!</a>
+    </div>
 </body>
 </html>
