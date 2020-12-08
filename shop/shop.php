@@ -2,7 +2,14 @@
 
 unset($t);
 session_start();
-
+// номер сессии
+$SID = session_id();
+// $t - массив указывающий на количество товара в корзине
+$t = [];
+if ( isset($_SESSION['t']) ) $t = $_SESSION['t'];
+// $c - основная переменная, указывающая на нужное действие
+$c = "";
+if( isset($_GET['c']) ) $c = $_GET['c'];
 
 $post=array(
        "Наименование организации",
@@ -41,86 +48,78 @@ include_once "../functions.php";
 //------------- основной код модуля shop -----------//
 //--------------------------------------------------//
 
-if(isset($_GET['c'])) $c = $_GET['c'];
 
-//  // $c - основная переменная, указывающая на нужное действие
-if ( !isset($c) ) {
-   $c = '';
-   // Очистка массива $t
-   $k = @array_keys( $t[all] );
-   for ( $i = 0; $i < count($k); $i++ ) 
-   {
-      unset( $t[$k[$i]] );
-      unset( $t[all][$k[$i]] );
-   }
-}
+// if ( !isset($c) ) {
+//    $c = '';   
+
+//    // Очистка массива $t
+//    $k = @array_keys( $t[all] );
+//    for ( $i = 0; $i < count( $k ); $i++ ) 
+//    {
+//       unset( $t[$k[$i]] );
+//       unset( $t[all][$k[$i]] );
+//    }
+// }
 
 switch($c) 
 {
 
    // без параметров - рисуем прайс-лист
    case "":   
-      echo "<TITLE>Интернет магазин</TITLE>";
-      summa(); // статистика по корзине 
-      echo "<center><FONT color=red size=5>Каталог</FONT></center>";
-      echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
-           "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td></table>";      
-      price(); // прайс      
+     echo "<TITLE>Интернет магазин</TITLE>";
+     summa(); // статистика по корзине 
+     echo "<center><FONT color=red size=5>Каталог</FONT></center>";
+     echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
+          "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td></table>";      
+     price(); // прайс      
    break;
 
+   // katal - рисуем прайс-лист и кнопу для перехода в корзину
    case "katal":   
-      echo "<TITLE>Интернет магазин</TITLE>";
-      summa(); // статистика по корзине
-      echo "<center><FONT color=red size=5>Каталог</FONT></center>";
-      echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
-           "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td>";  
-      // ссылка для перехода на корзину
-      echo "<td BGCOLOR=$coltab>&nbsp;&nbsp;<a href='$PHP_SELF?c=korzina&SID=$SID'>".
-           "Просмотреть корзину</a></td></table>";
-      price(); // прайс      
+     echo "<TITLE>Интернет магазин</TITLE>";
+     summa(); // статистика по корзине
+     echo "<center><FONT color=red size=5>Каталог</FONT></center>";
+     echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
+          "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td>";  
+     // ссылка для перехода на корзину
+     echo "<td BGCOLOR=$coltab>&nbsp;&nbsp;<a href='$PHP_SELF?c=korzina&SID=$SID'>".
+          "Просмотреть корзину</a></td></table>";
+     price(); // прайс      
    break;
 
    // вывод корзины
    case "korzina":
-      echo "<TITLE>Корзина</TITLE>";
-      summa();
-      echo "<center><FONT color=blue size=5>Корзина:</FONT></center>";
-      echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;<a href='\'>Главная страница</a>".
-           "&nbsp;&nbsp;<td BGCOLOR=$coltab>&nbsp;&nbsp;".
-           "<a href='$PHP_SELF?c=katal&SID=$SID'>Каталог товаров</a>&nbsp;&nbsp;</td></table>";
-      korzina(); // рисуем таблицу корзины           
+     echo "<TITLE>Корзина</TITLE>";
+     summa();
+     echo "<center><FONT color=blue size=5>Корзина:</FONT></center>";
+     echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;<a href='\'>Главная страница</a>".
+          "&nbsp;&nbsp;<td BGCOLOR=$coltab>&nbsp;&nbsp;".
+          "<a href='$PHP_SELF?c=katal&SID=$SID'>Каталог товаров</a>&nbsp;&nbsp;</td></table>";
+     korzina(); // рисуем таблицу корзины           
    break;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    // добавление из формы прайса всех товаров
    case "add":  
       // в массиве $v скоплены номера строк товаров, которые функция ...
 
-      // $k=@array_keys($v);
-      // for ($i=0; $i<count($k); $i++) 
-      // {
-      //    // ... tadd() преобразует из файла в данные и поместит в сессии
-      //    tadd($v[$k[$i]]);
-      // }
+     $v = $_GET['v'];
 
-      // надо перенаправить браузер на приличный адрес, чтобы:
-      // 1) в URL был написан приличный адрес
-      // 2) чтобы не было глюка, если посетитель нажмет ОБНОВИТЬ СТРАНИЦУ
-      
-      // exit(header("Location: $PHP_SELF?c=korzina&SID=$SID"));      
+     $k = @array_keys( $v );
+     for ($i = 0; $i < count( $k ); $i++) 
+     {
+        // ... tadd() преобразует из файла в данные и поместит в сессии
+        tadd( $v[$k[$i]] );
+     }
+
+     exit(header("Location: $PHP_SELF?c=korzina&SID=$SID"));      
    break;
+
+
+
+
+
+
+
 
 
    // измение кол-ва товаров

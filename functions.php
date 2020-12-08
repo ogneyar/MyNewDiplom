@@ -16,24 +16,18 @@ summa
 //-------------
 function tadd($n) 
 {   
-   // global $t, $hostname, $username, $password, $dbName, $usertable;
-   global $t, $usertable;
-
+   global $_SESSION, $usertable;
    global $mysqli;
+
+   $t = $_SESSION["t"];
    
-
-   // mysql_connect($hostname,$username,$password) or die ("Нет соединения с MySQL");
-   // mysql_select_db("$dbName")or die("Не могу выбрать базу данных ");
-
-   $query="select * from $usertable";
-   // $f=mysql_query($query);
-
+   $query="SELECT * FROM $usertable";
    
    $результат = $mysqli->query($query);
    if ($результат) $количество = $результат->num_rows;
+   else echo "нет результата (tadd)<br>";
    if($количество > 0) $arrayResult = $результат->fetch_all();
-
-   // $id=mysql_result($f,$n,0);
+   else echo "нет количества (tadd)<br>";
 
    $id = $arrayResult[$n][0];
 
@@ -41,40 +35,37 @@ function tadd($n)
 
    $t[all][$id] = $id;    // флаг, определяющий что товар уже есть в корзине
    //достаём наименование из БД
-   // $t[$id][name]=convert_cyr_string(mysql_result($f,$n,1),"d","w");
-   // $t[$id][cena]=mysql_result($f,$n,7);
-   // $t[$id][sklad]=mysql_result($f,$n,4);
-   // $t[$id][info]=mysql_result($f,$n,8);
-
    $t[$id][name] = $arrayResult[$n][1];
    $t[$id][cena] = $arrayResult[$n][7];
    $t[$id][sklad] = $arrayResult[$n][4];
    $t[$id][info] = $arrayResult[$n][8];
 
    $t[$id][kol] = 1;      // кол-во в начале равно "1 штуке"
-
-   session_register("t"); // записали переменную в сессию
-
-   // mysql_close();
-
-   $mysqli->close();
+   
+   $_SESSION["t"] = $t; // записали переменную в сессию
+   
 }
 //-------------
+
 
 //------------- Рисует таблицу с товарами в корзине. 
 function korzina() 
 {
-   global $t, $PHP_SELF, $SID, $ogl, $coltab, $F_sklad, $skid, $summ2;
+   global $_SESSION, $PHP_SELF, $SID, $ogl, $coltab, $F_sklad, $skid, $summ2;
    global $summ, $sm;
+
+   $t = $_SESSION["t"];
+
    // проходим массив $t[all] по списку его ключей
    $k = @array_keys( $t[all] );
    if (count($k) > 0)
    {      
+      echo "<center>";
       echo "<br><FONT color=red>КОЛИЧЕСТВО</FONT> товара ".
            "не вводите больше чем есть на складе!!!  ".
            "(при изменении количества нажмите 'внести изменения')";
-      echo "<br><FONT color=red>~</FONT> -приближённое значение (скидка считается от общей суммы заказа)";
-      echo "<form action=$PHP_SELF?c=kolvo&SID=$SID method=POST>".
+      echo "<br><FONT color=red>~</FONT> -приближённое значение (скидка считается от общей суммы заказа)<br><br>";
+      echo "<form action=$PHP_SELF?c=kolvo&SID=$SID method=GET>".
         // рисуем заголовок таблицы с корзиной:
            "<table border=2><tr align=center><th BGCOLOR=$coltab>$ogl[0]</th>".
            "<th BGCOLOR=$coltab>$ogl[1]</th>".
@@ -130,12 +121,13 @@ function korzina()
       // внизу таблицы две кнопки:
       //   Измениения - сохранить изменение числа товаров и обновить страницу
       //   Заказ - сохр. изм. + перейти на страницу оформления заказа
-      echo "</table><center><input type=submit name=zakaz value='Оформить заказ'> &nbsp;".
-           "&nbsp;<input type=submit name=edit value='Внести изменения'></center></form>";
+      echo "</table><br><br><input type=submit name=zakaz value='Оформить заказ'> &nbsp;".
+           "&nbsp;<input type=submit name=edit value='Внести изменения'></form>";
 
       echo "<a href='$PHP_SELF?c=delete&SID=$SID'>Очистить корзину!</a><br>";
            
-    }else echo "<br><br><br>КОРЗИНА ПУСТАЯ<br><br><br>";
+    }else echo "<br><br><br><center>КОРЗИНА ПУСТАЯ</center><br><br><br>";
+    echo "</center>";
 }
 //-------------
 
@@ -162,7 +154,7 @@ function price() {
    echo "<br><center>";   
    // форма (не забываем вписать $SID) + начало таблицы:
    echo "<form method=GET><input type=hidden name=c value=add>".
-        "<input type=hidden name=SID value=SID><table border=2>";
+        "<input type=hidden name=SID value=$SID><table border=2>";
    // рисуем заголовок таблицы
    echo "<tr>";
    for ($j = 0; $j < $x; $j++) 
@@ -202,7 +194,7 @@ function price() {
          }
          // рисуем колонку просмотр
          echo "<td BGCOLOR=$coltab>".               
-               "<a href=?c=view&SID=SID&n=$i>Просмотр</a></td>";
+               "<a href=?c=view&SID=$SID&n=$i>Просмотр</a></td>";
          //если нет на складе, то не выводить checkbox        
          if ($arrayResult[$i][2] < 1)
          {
@@ -220,7 +212,6 @@ function price() {
    echo "</table><br><button type=submit>".
         "Добавить в корзину</button></form></center>"; 
   
-   // $mysqli->close();
 }
 //-------------
 
