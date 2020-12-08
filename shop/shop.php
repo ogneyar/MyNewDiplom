@@ -28,6 +28,12 @@ $usertable="tovar";
 $coltab='#eeeedd';
 $col='#eeeeee';
 
+$mysqli = new mysqli($hostname, $username, $password, $dbName);
+if (mysqli_connect_errno()) {	
+   echo "<br><br><br><br><br><center>Ошибка! Нет подключения к БД.<br></center>"; 		
+   exit;  	
+}
+
 include_once "../functions.php";
 
 
@@ -55,7 +61,7 @@ switch($c)
    // без параметров - рисуем прайс-лист
    case "":   
       echo "<TITLE>Интернет магазин</TITLE>";
-     //  summa(); // статистика по корзине
+      summa(); // статистика по корзине 
       echo "<center><FONT color=red size=5>Каталог</FONT></center>";
       echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
            "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td></table>";      
@@ -64,7 +70,7 @@ switch($c)
 
    case "katal":   
       echo "<TITLE>Интернет магазин</TITLE>";
-      // summa(); // статистика по корзине
+      summa(); // статистика по корзине
       echo "<center><FONT color=red size=5>Каталог</FONT></center>";
       echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;".
            "<a href='\'>Главная страница</a>&nbsp;&nbsp;</td>";  
@@ -77,13 +83,25 @@ switch($c)
    // вывод корзины
    case "korzina":
       echo "<TITLE>Корзина</TITLE>";
-      // summa();
+      summa();
       echo "<center><FONT color=blue size=5>Корзина:</FONT></center>";
       echo "<table border=1><td BGCOLOR=$coltab>&nbsp;&nbsp;<a href='\'>Главная страница</a>".
            "&nbsp;&nbsp;<td BGCOLOR=$coltab>&nbsp;&nbsp;".
            "<a href='$PHP_SELF?c=katal&SID=$SID'>Каталог товаров</a>&nbsp;&nbsp;</td></table>";
-      // korzina(); // рисуем таблицу корзины           
+      korzina(); // рисуем таблицу корзины           
    break;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    // добавление из формы прайса всех товаров
@@ -264,5 +282,7 @@ switch($c)
    break;
 
 }  
+
+$mysqli->close();
 
 ?>

@@ -1,17 +1,12 @@
 <?php
-
-$mysqli = new mysqli($hostname, $username, $password, $dbName);
-if (mysqli_connect_errno()) {	
-   echo "<br><br><br><br><br><center>Ошибка! Нет подключения к БД.<br></center>"; 		
-   exit;  	
-}
-
-
-/*
+/* -----
+//
 tadd
 korzina
 price
+summa
 */
+// -----
 
 /* функция прибавляет в корзину новый товар, где $n - это номер строки
    в БД MySQL. Далее, в сессиях сохраняется не номер строки, а число
@@ -150,31 +145,24 @@ function korzina()
    колонка с checkbox'асами, отметив которые и нажав "добавив", можно
    занести товары в корзину.   */
 
-//-------------   СДЕЛАЛ!!!
+//------------- 
 
 function price() {
    global $t, $SID, $ogl, $coltab, $skid;   
    global $mysqli, $usertable;   
 
-
-   $query = "SELECT naim, cena, kolvo, asort FROM {$usertable}";
-   
-   $результат = $mysqli->query($query);
-   
+   $query = "SELECT naim, cena, kolvo, asort FROM {$usertable}";   
+   $результат = $mysqli->query($query);   
    if ($результат) $количество = $результат->num_rows;
    else echo "нет результата<br>";
-
    if($количество > 0) $arrayResult = $результат->fetch_all();
    else echo "нет количества<br>";
-
    $x = count($ogl);          // вычисляем число колонок
    $y = $количество;
-
    echo "<br><center>";   
    // форма (не забываем вписать $SID) + начало таблицы:
    echo "<form method=GET><input type=hidden name=c value=add>".
         "<input type=hidden name=SID value=SID><table border=2>";
-
    // рисуем заголовок таблицы
    echo "<tr>";
    for ($j = 0; $j < $x; $j++) 
@@ -184,39 +172,27 @@ function price() {
    }
    // рисуем колонку просмотр
    echo "<th BGCOLOR=$coltab>&nbsp;</th>";
-
    // рисуем колонку, где будут checkbox'ы
    echo "<th BGCOLOR=$coltab>'x'</th></tr>";
-
    $n = 0;
    // основной цикл вывода прайса
    for ($i = 0; $i < $y; $i++) {
-
-      $as = $arrayResult[$i][3];
-     
+      $as = $arrayResult[$i][3];     
       if ($as == true)
       {         
          $a[] = $n + 1;
          $a[] = $arrayResult[$i][0];
-         $a[] = $arrayResult[$i][1];         
-
+         $a[] = $arrayResult[$i][1];
          $c = $arrayResult[$i][1];
-
          $c2 = $c / 100 * $skid;
          $c = $c - $c2;
-
          //Округление до сотых
          $c = $c * 100;
          $c = round($c) / 100;
-
          $a[] = $c;
-
-         $a[] = $arrayResult[$i][2];
-                  
+         $a[] = $arrayResult[$i][2];                  
          if (count($a)<2) continue; // если она пустая (глюки), пропускаем
-
          echo "<tr ALIGN=center>";
-
          // цикл вывода всех колонок текущей строки таблицы
          for ($j = 0; $j < $x; $j++) 
          {
@@ -224,12 +200,9 @@ function price() {
             if (strlen($a[$j]) == 0) echo "<td BGCOLOR=$coltab>&nbsp;</td>";               
             else echo "<td BGCOLOR=$coltab>$a[$j]</td>";
          }
-
          // рисуем колонку просмотр
          echo "<td BGCOLOR=$coltab>".               
                "<a href=?c=view&SID=SID&n=$i>Просмотр</a></td>";
-
-
          //если нет на складе, то не выводить checkbox        
          if ($arrayResult[$i][2] < 1)
          {
@@ -239,18 +212,73 @@ function price() {
          {           
             echo "<td BGCOLOR=$coltab><input type=checkbox name=v[$i] value=$i></td>";
          }
-
          echo "</tr>";
-         unset($a);
-         
+         unset($a);         
          $n = $n + 1;
       }
    }
    echo "</table><br><button type=submit>".
         "Добавить в корзину</button></form></center>"; 
-
   
-   $mysqli->close();
+   // $mysqli->close();
+}
+//-------------
+
+
+
+/* Выводит на экран несколько чисел (написано). Подсчет значений происходит
+   при каджом вызове.   */
+
+//-------------
+function summa() 
+{
+   global $t ,$col, $summ, $sm;
+   global $skid, $summ2;
+   global $mysqli;
+
+   echo"<BODY BGCOLOR=$col>";
+   // традиционный проход массива товаров из корзины
+   $k = @array_keys( $t[all] );
+   $summ2 = 0; 
+   for ($i = 0; $i < count( $k ); $i++) 
+   {
+      $id = $k[$i];
+      
+      $summ += (double)$t[$id][kol] * (double)$t[$id][cena];
+      $summ2 += $t[$id][kol];
+   }
+
+   $query = "SELECT * FROM skid";
+   $результат = $mysqli->query($query);   
+   if ($результат) $количество = $результат->num_rows;
+   else echo "нет результата (summa)<br>";
+   if($количество > 0) $arrayResult = $результат->fetch_all();
+   else echo "нет количества (summa)<br>";
+   
+   $skid = 0;
+   for ($j = 0; $j < $количество; $j++)
+   {
+      $svishe = $arrayResult[$i][1];
+      $sk = $arrayResult[$i][2];
+      if ($summ > $svishe) $skid=$sk;
+   }
+   $su = $summ / 100 * $skid;
+   $sm = $summ - $su;
+
+   //Округление до сотых
+   $sm = $sm * 100;
+   $sm = round( $sm ) / 100;
+
+   // просто выводим посчитанные цифры на экран
+   echo "<center><FONT color=black> ".
+        "Выбраных товаров: <FONT color=red>$i</FONT> шт.".
+        " Общее количество: <FONT color=red>$summ2</FONT> шт. Сумма: ".
+        sprintf("<FONT color=red>%.2f</FONT> руб.",$summ).
+        " Скидка: <FONT color=red>$skid</font> %".
+        " Сумма (со скидкой): ".
+        sprintf("<FONT color=red>%.2f</FONT> руб.",$sm).
+        "</FONT><hr color=blue></center>";
+     
 }
 //-------------
 
@@ -275,61 +303,6 @@ function price() {
 
 
 
-
-/* Выводит на экран несколько чисел (написано). Подсчет значений происходит
-   при каджом вызове.   */
-
-//-------------
-// function summa() 
-// {
-//    global $t ,$col,$summ, $sm;
-//    global $hostname, $username, $password, $dbName, $skid, $summ2;
-//    echo"<BODY BGCOLOR=$col>";
-//    // традиционный проход массива товаров из корзины
-//    $k=@array_keys($t[all]);
-//    $summ2=0; 
-//    for ($i=0; $i<count($k); $i++) 
-//    {
-//       $id=$k[$i];
-      
-//       $summ+=(double)$t[$id][kol]* (double)$t[$id][cena];
-//       $summ2+=$t[$id][kol];
-//    }
-
-//    $usertable="skid";
-//    mysql_connect($hostname,$username,$password) OR DIE("Не могу создать соединение ");
-//    mysql_select_db("$dbName") or die("Не могу выбрать базу данных "); 
-//    $q="select * from $usertable";
-//    $r=mysql_query($q);
-//    $kl=mysql_num_rows($r);
-//    $skid=0;
-//    for ($j=0; $j<$kl; $j++)
-//    {
-//       $svishe=convert_cyr_string(mysql_result($r,$j,1),"w","d");
-//       $sk=convert_cyr_string(mysql_result($r,$j,2),"w","d");
-//       if ($summ>$svishe) $skid=$sk;
-//    }
-//    $su=$summ/100*$skid;
-//    $sm=$summ-$su;
-
-//    //Округление до сотых
-//    $sm=$sm*100;
-//    $sm=round($sm)/100;
-
-//    $usertable = "tovar";
-
-//    // просто выводим посчитанные цифры на экран
-//    echo "<center><FONT color=black> ".
-//         "Выбраных товаров: <FONT color=red>$i</FONT> шт.".
-//         " Общее количество: <FONT color=red>$summ2</FONT> шт. Сумма: ".
-//         sprintf("<FONT color=red>%.2f</FONT> руб.",$summ).
-//         " Скидка: <FONT color=red>$skid</font> %".
-//         " Сумма (со скидкой): ".
-//         sprintf("<FONT color=red>%.2f</FONT> руб.",$sm).
-//         "</FONT><hr color=blue></center>";
-//    mysql_close();
-// }
-// //-------------
 
 
 // // добавление данных в таблицы
