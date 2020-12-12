@@ -65,7 +65,9 @@ function korzina()
            "не вводите больше чем есть на складе!!!  ".
            "(при изменении количества нажмите 'внести изменения')";
       echo "<br><FONT color=red>~</FONT> -приближённое значение (скидка считается от общей суммы заказа)<br><br>";
-      echo "<form action=$PHP_SELF?c=kolvo&SID=$SID method=GET>".
+      echo "<form method=GET>".
+           "<input type=hidden name=c value='kolvo'>".
+           "<input type=hidden name=SID value='$SID'>".
         // рисуем заголовок таблицы с корзиной:
            "<table border=2><tr align=center><th BGCOLOR=$coltab>$ogl[0]</th>".
            "<th BGCOLOR=$coltab>$ogl[1]</th>".
