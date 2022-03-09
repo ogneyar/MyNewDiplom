@@ -1,1 +1,1 @@
-# MyDiplom in a new version
+# My graduate work (диплом) in a new version
