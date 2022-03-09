@@ -1,1 +1,1 @@
-# MyNewDiplom
+# MyDiplom in a new version
